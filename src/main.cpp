@@ -12,6 +12,12 @@ CRGB atomPixel;
 #include <M5_PbHub.h>
 M5_PbHub myPbHub;
 
+#include <MicroOscSlip.h>
+// Le nombre 128 entre les < > ci-dessous est le nombre maximal d'octets réservés pour les messages entrants.
+// Les messages sortants sont écrits directement sur la sortie et ne nécessitent pas de réservation d'octets supplémentaires.
+MicroOscSlip<128> monOsc(&Serial);
+
+
 #define KEY_CHANNEL 0
 
 void setup()
@@ -28,8 +34,11 @@ void setup()
 
   Wire.begin();
   myPbHub.begin();
+  Serial.begin(115200);
 
   myPbHub.setPixelCount(KEY_CHANNEL, 1);
+
+ 
 }
 
 void loop()
@@ -37,8 +46,11 @@ void loop()
   // int maLectureKey = digitalRead(BROCHE_ATOM_FIL_BLANC);
 
   int maLectureKey = myPbHub.digitalRead(KEY_CHANNEL);
+  monOsc.sendInt("/But", maLectureKey);
 
   int maLectureAtomBouton = digitalRead(BROCHE_ATOM_BOUTON);
+  monOsc.sendInt("/ton", maLectureAtomBouton);
+
 
   if (maLectureKey == 1)
   {
